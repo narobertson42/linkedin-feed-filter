@@ -1,0 +1,20 @@
+{
+    "manifest_version": 3,
+    "name": "LinkedIn Feed Filter",
+    "version": "1.0",
+    "description": "A Chrome extension to remove crap content from LinkedIn feed.",
+    "permissions": [],
+    "host_permissions": [],
+    "icons": {
+        "16": "icons/icon16.png",
+        "32": "icons/icon32.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://*.linkedin.com/feed/"],
+            "js": ["content.js"]
+        }
+    ]
+}
