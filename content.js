@@ -1,3 +1,33 @@
+function onUrlChange(callback) {
+  let currentUrl = location.href;
+
+  const wrapHistoryMethod = (method) => {
+    const original = history[method];
+    history[method] = function (...args) {
+      const result = original.apply(this, args);
+      if (location.href !== currentUrl) {
+        currentUrl = location.href;
+        callback(currentUrl);
+      }
+      return result;
+    };
+  };
+
+  wrapHistoryMethod("pushState");
+  wrapHistoryMethod("replaceState");
+
+  window.addEventListener("popstate", () => {
+    if (location.href !== currentUrl) {
+      currentUrl = location.href;
+      callback(currentUrl);
+    }
+  });
+}
+
+function isOnFeedPage() {
+  return location.pathname.startsWith("/feed");
+}
+
 function removeAsideElement() {
   document.querySelector(".scaffold-layout__aside")?.remove();
 }
@@ -37,6 +67,9 @@ function replaceBadFeedElements() {
 }
 
 function cleanupLinkedinFeed() {
+  if (!isOnFeedPage()) return;
+  console.log("Cleaning Linkedin feed:", newUrl);
+
   replaceBadFeedElements();
   removeAsideElement();
 }
@@ -46,4 +79,11 @@ cleanupLinkedinFeed();
 new MutationObserver(cleanupLinkedinFeed).observe(document.body, {
   childList: true,
   subtree: true,
+});
+
+onUrlChange((newUrl) => {
+  if (isOnFeedPage()) {
+    console.log("Navigated to feed:", newUrl);
+    cleanupLinkedinFeed();
+  }
 });
